@@ -1,6 +1,6 @@
 mod game_states;
 
-use macroquad::{prelude::*, telemetry::frame};
+use macroquad::prelude::*;
 
 const DEV_MODE: bool = true;
 const TARGET_FPS: f32 = 60.0;
