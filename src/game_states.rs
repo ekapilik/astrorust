@@ -20,7 +20,11 @@ struct SpaceShip {
     bottom_right: Vec2,
     bottom_center: Vec2,
     bottom_left: Vec2,
-    color: Color,
+    flames_left: Vec2,
+    flames_right: Vec2,
+    flames_center: Vec2,
+    ship_color: Color,
+    flame_color: Color,
     thickness: f32,
 }
 
@@ -56,7 +60,8 @@ impl SpaceShip {
             bottom_right,
             bottom_center,
             bottom_left,
-            color: WHITE,
+            ship_color: WHITE,
+            flame_color: RED,
             thickness: 2.0,
         }
     }
@@ -91,11 +96,19 @@ impl SpaceShip {
             self.body.point.y + height / 2.0,
         );
 
+        // flames
+        let flames_left = vec2(self.body.point.x - width / 2.0, self.body.point.y + height);
+        let flames_right = vec2(self.body.point.x + width / 2.0, self.body.point.y + height);
+        let flames_center = vec2(self.body.point.x, self.body.point.y + height + 10.0);
+
         let rotation = self.body.rotation + std::f32::consts::PI / 2.0;
         self.top_center = rotate_point(self.body.point, top_center, rotation);
         self.bottom_right = rotate_point(self.body.point, bottom_right, rotation);
         self.bottom_center = rotate_point(self.body.point, bottom_center, rotation);
         self.bottom_left = rotate_point(self.body.point, bottom_left, rotation);
+        self.flames_left = rotate_point(self.body.point, flames_left, rotation);
+        self.flames_right = rotate_point(self.body.point, flames_right, rotation);
+        self.flames_center = rotate_point(self.body.point, flames_center, rotation);
     }
 
     fn warp_around(&mut self) {
@@ -134,7 +147,7 @@ impl SpaceShip {
             self.bottom_right.x,
             self.bottom_right.y,
             self.thickness,
-            self.color,
+            self.ship_color,
         );
         draw_line(
             self.bottom_right.x,
@@ -142,7 +155,7 @@ impl SpaceShip {
             self.bottom_center.x,
             self.bottom_center.y,
             self.thickness,
-            self.color,
+            self.ship_color,
         );
         draw_line(
             self.bottom_center.x,
@@ -150,7 +163,7 @@ impl SpaceShip {
             self.bottom_left.x,
             self.bottom_left.y,
             self.thickness,
-            self.color,
+            self.ship_color,
         );
         draw_line(
             self.bottom_left.x,
@@ -158,7 +171,7 @@ impl SpaceShip {
             self.top_center.x,
             self.top_center.y,
             self.thickness,
-            self.color,
+            self.ship_color,
         );
     }
 }
