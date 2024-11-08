@@ -4,6 +4,7 @@ const FONT_COLOR: Color = WHITE;
 
 const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
 const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
+const DRAG_COEFFICIENT: f32 = 0.99;
 
 #[derive(Debug, Clone, Copy)]
 struct Body {
@@ -70,8 +71,8 @@ impl SpaceShip {
     }
 
     fn drag(&mut self) {
-        self.body.acceleration *= 0.9;
-        self.body.velocity *= 0.9;
+        self.body.acceleration *= 0.0;
+        self.body.velocity *= DRAG_COEFFICIENT;
     }
 
     fn build_space_ship(&mut self) {
@@ -246,7 +247,6 @@ pub fn update_game_state(game_state: &mut GameState) {
             let rotate_left = is_key_down(KeyCode::Left) || is_key_down(KeyCode::A);
             let rotate_right = is_key_down(KeyCode::Right) || is_key_down(KeyCode::D);
             let thrust_forward = is_key_down(KeyCode::Up) || is_key_down(KeyCode::W);
-            let thrust_backward = is_key_down(KeyCode::Down) || is_key_down(KeyCode::S);
 
             let mut rotation = 0.0;
             let mut thrust = 0.0;
@@ -259,9 +259,6 @@ pub fn update_game_state(game_state: &mut GameState) {
             }
             if thrust_forward {
                 thrust += LINEAR_ACCELERATION;
-            }
-            if thrust_backward {
-                thrust -= LINEAR_ACCELERATION;
             }
 
             playing_info.space_ship.rotate(rotation);
