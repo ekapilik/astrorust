@@ -26,6 +26,7 @@ struct SpaceShip {
     ship_color: Color,
     flame_color: Color,
     thickness: f32,
+    is_thrusting: bool,
 }
 
 fn rotate_point(base: Vec2, end: Vec2, rotation: f32) -> Vec2 {
@@ -49,6 +50,11 @@ impl SpaceShip {
         let bottom_center = vec2(x, y + height / 4.0);
         let bottom_left = vec2(x - width / 2.0, y + height / 2.0);
 
+        // flames
+        let flames_left = vec2(x - width / 2.0, y + height);
+        let flames_right = vec2(x + width / 2.0, y + height);
+        let flames_center = vec2(x, y + height + 10.0);
+
         SpaceShip {
             body: Body {
                 rotation: 0.0,
@@ -60,9 +66,13 @@ impl SpaceShip {
             bottom_right,
             bottom_center,
             bottom_left,
+            flames_left,
+            flames_right,
+            flames_center,
             ship_color: WHITE,
-            flame_color: RED,
+            flame_color: BLUE,
             thickness: 2.0,
+            is_thrusting: false,
         }
     }
 
@@ -76,6 +86,8 @@ impl SpaceShip {
     }
 
     fn drag(&mut self) {
+        self.is_thrusting = self.body.acceleration.length() > 0.0;
+
         self.body.acceleration *= 0.0;
         self.body.velocity *= DRAG_COEFFICIENT;
     }
@@ -97,9 +109,8 @@ impl SpaceShip {
         );
 
         // flames
-        let flames_left = vec2(self.body.point.x - width / 2.0, self.body.point.y + height);
-        let flames_right = vec2(self.body.point.x + width / 2.0, self.body.point.y + height);
-        let flames_center = vec2(self.body.point.x, self.body.point.y + height + 10.0);
+        let flames_left = vec2(self.body.point.x - width / 3.0, self.body.point.y + height);
+        let flames_right = vec2(self.body.point.x + width / 3.0, self.body.point.y + height);
 
         let rotation = self.body.rotation + std::f32::consts::PI / 2.0;
         self.top_center = rotate_point(self.body.point, top_center, rotation);
@@ -108,7 +119,7 @@ impl SpaceShip {
         self.bottom_left = rotate_point(self.body.point, bottom_left, rotation);
         self.flames_left = rotate_point(self.body.point, flames_left, rotation);
         self.flames_right = rotate_point(self.body.point, flames_right, rotation);
-        self.flames_center = rotate_point(self.body.point, flames_center, rotation);
+        self.flames_center = rotate_point(self.body.point, bottom_center, rotation);
     }
 
     fn warp_around(&mut self) {
@@ -173,6 +184,25 @@ impl SpaceShip {
             self.thickness,
             self.ship_color,
         );
+
+        if self.is_thrusting {
+            draw_line(
+                self.flames_left.x,
+                self.flames_left.y,
+                self.flames_center.x,
+                self.flames_center.y,
+                self.thickness,
+                self.flame_color,
+            );
+            draw_line(
+                self.flames_center.x,
+                self.flames_center.y,
+                self.flames_right.x,
+                self.flames_right.y,
+                self.thickness,
+                self.flame_color,
+            );
+        }
     }
 }
 
