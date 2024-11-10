@@ -1,5 +1,8 @@
 pub mod body;
+pub mod game_render;
+pub mod game_state_machine;
 pub mod game_states;
+pub mod screen_util;
 pub mod shape;
 pub mod space_ship;
 
@@ -18,8 +21,8 @@ async fn main() {
         clear_background(BACKGROUND_COLOR);
         draw_fps();
 
-        game_states::update_game_state(&mut game_state);
-        game_states::render(&game_state);
+        game_state_machine::update_game_state(&mut game_state);
+        game_render::render(&game_state);
 
         std::thread::sleep(frame_sleep_duration);
         next_frame().await // Blocks until the next frame, used to control the game loop.
