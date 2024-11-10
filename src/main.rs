@@ -1,6 +1,7 @@
 pub mod body;
 pub mod game_states;
 pub mod shape;
+pub mod space_ship;
 
 use macroquad::prelude::*;
 
