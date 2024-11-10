@@ -126,7 +126,7 @@ impl SpaceShip {
     }
 }
 
-struct PlayingInfo {
+pub struct PlayingInfo {
     score: u32,
     level: u32,
     space_ship: SpaceShip,
