@@ -1,4 +1,6 @@
-mod game_states;
+pub mod body;
+pub mod game_states;
+pub mod shape;
 
 use macroquad::prelude::*;
 

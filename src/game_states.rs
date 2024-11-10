@@ -1,3 +1,5 @@
+use crate::body::*;
+use crate::shape::*;
 use macroquad::prelude::*;
 
 const FONT_COLOR: Color = WHITE;
@@ -6,64 +8,12 @@ const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
 const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
 const DRAG_COEFFICIENT: f32 = 0.99;
 
-#[derive(Debug, Clone, Copy)]
-struct Body {
-    point: Vec2,
-    velocity: Vec2,
-    acceleration: Vec2,
-    rotation: f32,
-}
-
-struct Shape {
-    points: Vec<Vec2>,
-    color: Color,
-    thickness: f32,
-}
-
-impl Shape {
-    fn transform(&self, center: Vec2, rotation: f32) -> Vec<Vec2> {
-        let translated_points: Vec<Vec2> =
-            self.points.iter().map(|point| *point + center).collect();
-        let rotated_points: Vec<Vec2> = translated_points
-            .iter()
-            .map(|point| rotate_point(center, *point, rotation))
-            .collect();
-        return rotated_points;
-    }
-
-    fn draw(&self, center: Vec2, rotation: f32) {
-        let transformed_points = self.transform(center, rotation);
-        let mut prev_point = transformed_points.first().unwrap();
-        let remaining_points = &transformed_points[1..];
-        for point in remaining_points {
-            draw_line(
-                prev_point.x,
-                prev_point.y,
-                point.x,
-                point.y,
-                self.thickness,
-                self.color,
-            );
-            prev_point = point;
-        }
-    }
-}
-
 struct SpaceShip {
     body: Body,
     ship_shape: Shape,
     flames_shape_base: Shape,
     flames_shape_extended: Shape,
     is_thrusting: bool,
-}
-
-fn rotate_point(base: Vec2, end: Vec2, rotation: f32) -> Vec2 {
-    // https://math.stackexchange.com/questions/270194/how-to-find-the-vertices-angle-after-rotation
-    let dx = end.x - base.x;
-    let dy = end.y - base.y;
-    let x = base.x + dx * rotation.cos() - dy * rotation.sin();
-    let y = base.y + dx * rotation.sin() + dy * rotation.cos();
-    return vec2(x, y);
 }
 
 impl SpaceShip {

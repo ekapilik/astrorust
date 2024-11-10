@@ -1,0 +1,1 @@
+https://codingchallenges.fyi/challenges/challenge-asteroids
