@@ -6,7 +6,6 @@ const FONT_COLOR: Color = WHITE;
 
 const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
 const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
-const DRAG_COEFFICIENT: f32 = 0.99;
 
 struct SpaceShip {
     body: Body,
@@ -39,6 +38,9 @@ impl SpaceShip {
                 point: start_point,
                 velocity: vec2(0.0, 0.0),
                 acceleration: vec2(0.0, 0.0),
+                drag_coefficient: 0.99,
+                screen_edge_behavior: ScreenEdgeBehavior::Wrap,
+                destoryed: false,
             },
             ship_shape: Shape {
                 points: vec![
@@ -70,47 +72,8 @@ impl SpaceShip {
     }
 
     pub fn apply_thrust(&mut self, thrust: f32) {
-        self.body.acceleration.x += thrust * self.body.rotation.cos();
-        self.body.acceleration.y += thrust * self.body.rotation.sin();
-    }
-
-    pub fn rotate(&mut self, rotation: f32) {
-        self.body.rotation = (self.body.rotation + rotation) % (2.0 * std::f32::consts::PI);
-    }
-
-    fn drag(&mut self) {
-        self.is_thrusting = self.body.acceleration.length() > 0.0;
-
-        self.body.acceleration *= 0.0;
-        self.body.velocity *= DRAG_COEFFICIENT;
-    }
-
-    fn warp_around(&mut self) {
-        let screen_width = screen_width();
-        let screen_height = screen_height();
-        if self.body.point.x > screen_width {
-            self.body.point.x = 0.0;
-        } else if self.body.point.x < 0.0 {
-            self.body.point.x = screen_width;
-        }
-        if self.body.point.y > screen_height {
-            self.body.point.y = 0.0;
-        } else if self.body.point.y < 0.0 {
-            self.body.point.y = screen_height;
-        }
-    }
-
-    pub fn update(&mut self, dt: f32) {
-        println!("--------------");
-        println!("point: {:?}", self.body.point);
-        println!("velocity: {:?}", self.body.velocity);
-        println!("acceleration: {:?}", self.body.acceleration);
-        println!("rotation: {:?}", self.body.rotation);
-
-        self.body.velocity += self.body.acceleration * dt;
-        self.body.point += self.body.velocity * dt;
-        self.drag();
-        self.warp_around();
+        self.body.apply_thrust(thrust);
+        self.is_thrusting = thrust > 0.0;
     }
 
     pub fn render(&self) {
@@ -248,10 +211,9 @@ pub fn update_game_state(game_state: &mut GameState) {
                 thrust += LINEAR_ACCELERATION;
             }
 
-            playing_info.space_ship.rotate(rotation);
+            playing_info.space_ship.body.rotate(rotation);
             playing_info.space_ship.apply_thrust(thrust);
-            // update space ship
-            playing_info.space_ship.update(dt);
+            playing_info.space_ship.body.update(dt);
 
             if is_key_released(KeyCode::Escape) {
                 *game_state = GameState::MainMenu;
