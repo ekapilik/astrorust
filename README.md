@@ -1,4 +1,4 @@
-# Asteroids
+# AstroRust
 Coding challenge to learn rust. Reference: [challenge-asteroids](https://codingchallenges.fyi/challenges/challenge-asteroids)
 
 ## Development Setup
