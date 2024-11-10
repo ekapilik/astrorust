@@ -156,11 +156,25 @@ pub fn render(game_state: &GameState) {
 fn render_main_menu() {
     let center_x = get_center_x();
     let center_y = get_center_y();
-    draw_text("Main Menu", center_x, center_y, 30.0, FONT_COLOR);
+    draw_text("Main Menu", center_x, center_y - 80.0, 30.0, FONT_COLOR);
     draw_text(
         "Press Enter to start",
         center_x - 30.0,
-        center_y + 50.0,
+        center_y + 0.0,
+        20.0,
+        WHITE,
+    );
+    draw_text(
+        "Arrow keys or WASD to move",
+        center_x - 60.0,
+        center_y + 30.0,
+        20.0,
+        WHITE,
+    );
+    draw_text(
+        "Press q to quit",
+        center_x - 20.0,
+        center_y + 60.0,
         20.0,
         WHITE,
     );
@@ -195,7 +209,10 @@ fn get_center_y() -> f32 {
 pub fn update_game_state(game_state: &mut GameState) {
     match game_state {
         GameState::MainMenu => {
-            if is_key_released(KeyCode::Enter) {
+            let start = is_key_released(KeyCode::Enter);
+            let quit = is_key_released(KeyCode::Q);
+
+            if start {
                 *game_state = GameState::Playing {
                     playing_info: PlayingInfo {
                         score: 0,
@@ -207,6 +224,9 @@ pub fn update_game_state(game_state: &mut GameState) {
                         ),
                     },
                 };
+            }
+            if quit {
+                std::process::exit(0);
             }
         }
         GameState::Playing { playing_info } => {
