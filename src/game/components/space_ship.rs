@@ -1,5 +1,5 @@
-use crate::body::*;
-use crate::shape::*;
+use crate::physics::body::*;
+use crate::render::shape::*;
 use macroquad::prelude::*;
 
 pub struct SpaceShip {

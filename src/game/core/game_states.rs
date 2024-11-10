@@ -1,4 +1,4 @@
-use crate::space_ship::*;
+use crate::game::components::space_ship::*;
 use macroquad::prelude::*;
 
 pub struct PlayingInfo {

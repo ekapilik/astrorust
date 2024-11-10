@@ -1,6 +1,6 @@
-use crate::game_states::*;
-use crate::screen_util::*;
-use crate::space_ship::*;
+use crate::game::components::space_ship::*;
+use crate::game::core::game_states::*;
+use crate::utils::screen_util::*;
 use macroquad::prelude::*;
 
 const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
