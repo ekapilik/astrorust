@@ -14,18 +14,46 @@ struct Body {
     rotation: f32,
 }
 
+struct Shape {
+    points: Vec<Vec2>,
+    color: Color,
+    thickness: f32,
+}
+
+impl Shape {
+    fn transform(&self, center: Vec2, rotation: f32) -> Vec<Vec2> {
+        let translated_points: Vec<Vec2> =
+            self.points.iter().map(|point| *point + center).collect();
+        let rotated_points: Vec<Vec2> = translated_points
+            .iter()
+            .map(|point| rotate_point(center, *point, rotation))
+            .collect();
+        return rotated_points;
+    }
+
+    fn draw(&self, center: Vec2, rotation: f32) {
+        let transformed_points = self.transform(center, rotation);
+        let mut prev_point = transformed_points.first().unwrap();
+        let remaining_points = &transformed_points[1..];
+        for point in remaining_points {
+            draw_line(
+                prev_point.x,
+                prev_point.y,
+                point.x,
+                point.y,
+                self.thickness,
+                self.color,
+            );
+            prev_point = point;
+        }
+    }
+}
+
 struct SpaceShip {
     body: Body,
-    top_center: Vec2,
-    bottom_right: Vec2,
-    bottom_center: Vec2,
-    bottom_left: Vec2,
-    flames_left: Vec2,
-    flames_right: Vec2,
-    flames_center: Vec2,
-    ship_color: Color,
-    flame_color: Color,
-    thickness: f32,
+    ship_shape: Shape,
+    flames_shape_base: Shape,
+    flames_shape_extended: Shape,
     is_thrusting: bool,
 }
 
@@ -40,38 +68,53 @@ fn rotate_point(base: Vec2, end: Vec2, rotation: f32) -> Vec2 {
 
 impl SpaceShip {
     // constructor
-    pub fn new(x: f32, y: f32) -> SpaceShip {
-        let width = 20.0;
-        let height = 20.0;
-
+    pub fn new(width: f32, height: f32, start_point: Vec2) -> SpaceShip {
         // triangle with indent
-        let top_center = vec2(x, y - height / 2.0);
-        let bottom_right = vec2(x + width / 2.0, y + height / 2.0);
-        let bottom_center = vec2(x, y + height / 4.0);
-        let bottom_left = vec2(x - width / 2.0, y + height / 2.0);
-
-        // flames
-        let flames_left = vec2(x - width / 2.0, y + height);
-        let flames_right = vec2(x + width / 2.0, y + height);
-        let flames_center = vec2(x, y + height + 10.0);
+        let top_center = vec2(height / 2.0, 0.0);
+        let bottom_right = vec2(-width / 2.0, height / 2.0);
+        let bottom_center = vec2(-width / 4.0, 0.0);
+        let bottom_left = vec2(-width / 2.0, -height / 2.0);
+        // flames base
+        let flames_base_left = vec2(-width * 1.2, -height / 2.0);
+        let flames_base_center = vec2(-width * 0.5, 0.0);
+        let flames_base_right = vec2(-width * 1.2, height / 2.0);
+        // flames extended
+        let flames_extended_left = vec2(-width * 1.5, -height / 4.0);
+        let flames_extended_center = vec2(-width * 0.5, 0.0);
+        let flames_extended_right = vec2(-width * 1.5, height / 4.0);
 
         SpaceShip {
             body: Body {
                 rotation: 0.0,
-                point: vec2(x, y),
+                point: start_point,
                 velocity: vec2(0.0, 0.0),
                 acceleration: vec2(0.0, 0.0),
             },
-            top_center,
-            bottom_right,
-            bottom_center,
-            bottom_left,
-            flames_left,
-            flames_right,
-            flames_center,
-            ship_color: WHITE,
-            flame_color: BLUE,
-            thickness: 2.0,
+            ship_shape: Shape {
+                points: vec![
+                    top_center,
+                    bottom_right,
+                    bottom_center,
+                    bottom_left,
+                    top_center,
+                ],
+                color: WHITE,
+                thickness: 2.0,
+            },
+            flames_shape_base: Shape {
+                points: vec![flames_base_left, flames_base_center, flames_base_right],
+                color: RED,
+                thickness: 2.0,
+            },
+            flames_shape_extended: Shape {
+                points: vec![
+                    flames_extended_left,
+                    flames_extended_center,
+                    flames_extended_right,
+                ],
+                color: YELLOW,
+                thickness: 2.0,
+            },
             is_thrusting: false,
         }
     }
@@ -90,36 +133,6 @@ impl SpaceShip {
 
         self.body.acceleration *= 0.0;
         self.body.velocity *= DRAG_COEFFICIENT;
-    }
-
-    fn build_space_ship(&mut self) {
-        let width = 20.0;
-        let height = 20.0;
-
-        // triangle with indent
-        let top_center = vec2(self.body.point.x, self.body.point.y - height / 2.0);
-        let bottom_right = vec2(
-            self.body.point.x + width / 2.0,
-            self.body.point.y + height / 2.0,
-        );
-        let bottom_center = vec2(self.body.point.x, self.body.point.y + height / 4.0);
-        let bottom_left = vec2(
-            self.body.point.x - width / 2.0,
-            self.body.point.y + height / 2.0,
-        );
-
-        // flames
-        let flames_left = vec2(self.body.point.x - width / 3.0, self.body.point.y + height);
-        let flames_right = vec2(self.body.point.x + width / 3.0, self.body.point.y + height);
-
-        let rotation = self.body.rotation + std::f32::consts::PI / 2.0;
-        self.top_center = rotate_point(self.body.point, top_center, rotation);
-        self.bottom_right = rotate_point(self.body.point, bottom_right, rotation);
-        self.bottom_center = rotate_point(self.body.point, bottom_center, rotation);
-        self.bottom_left = rotate_point(self.body.point, bottom_left, rotation);
-        self.flames_left = rotate_point(self.body.point, flames_left, rotation);
-        self.flames_right = rotate_point(self.body.point, flames_right, rotation);
-        self.flames_center = rotate_point(self.body.point, bottom_center, rotation);
     }
 
     fn warp_around(&mut self) {
@@ -148,60 +161,17 @@ impl SpaceShip {
         self.body.point += self.body.velocity * dt;
         self.drag();
         self.warp_around();
-        self.build_space_ship();
     }
 
-    pub fn draw(&self) {
-        draw_line(
-            self.top_center.x,
-            self.top_center.y,
-            self.bottom_right.x,
-            self.bottom_right.y,
-            self.thickness,
-            self.ship_color,
-        );
-        draw_line(
-            self.bottom_right.x,
-            self.bottom_right.y,
-            self.bottom_center.x,
-            self.bottom_center.y,
-            self.thickness,
-            self.ship_color,
-        );
-        draw_line(
-            self.bottom_center.x,
-            self.bottom_center.y,
-            self.bottom_left.x,
-            self.bottom_left.y,
-            self.thickness,
-            self.ship_color,
-        );
-        draw_line(
-            self.bottom_left.x,
-            self.bottom_left.y,
-            self.top_center.x,
-            self.top_center.y,
-            self.thickness,
-            self.ship_color,
-        );
-
+    pub fn render(&self) {
+        self.ship_shape.draw(self.body.point, self.body.rotation);
         if self.is_thrusting {
-            draw_line(
-                self.flames_left.x,
-                self.flames_left.y,
-                self.flames_center.x,
-                self.flames_center.y,
-                self.thickness,
-                self.flame_color,
-            );
-            draw_line(
-                self.flames_center.x,
-                self.flames_center.y,
-                self.flames_right.x,
-                self.flames_right.y,
-                self.thickness,
-                self.flame_color,
-            );
+            self.flames_shape_base
+                .draw(self.body.point, self.body.rotation);
+            if rand::gen_range(0, 100) < 66 {
+                self.flames_shape_extended
+                    .draw(self.body.point, self.body.rotation);
+            }
         }
     }
 }
@@ -225,7 +195,7 @@ pub fn render(game_state: &GameState) {
         }
         GameState::Playing { playing_info } => {
             render_playing_info(playing_info);
-            playing_info.space_ship.draw();
+            playing_info.space_ship.render();
         }
         GameState::GameOver => {
             draw_text("Game Over", 10.0, 10.0, 30.0, FONT_COLOR);
@@ -280,7 +250,11 @@ pub fn update_game_state(game_state: &mut GameState) {
                     playing_info: PlayingInfo {
                         score: 0,
                         level: 1,
-                        space_ship: SpaceShip::new(get_center_x(), get_center_y()),
+                        space_ship: SpaceShip::new(
+                            20.0,
+                            20.0,
+                            vec2(get_center_x(), get_center_y()),
+                        ),
                     },
                 };
             }
