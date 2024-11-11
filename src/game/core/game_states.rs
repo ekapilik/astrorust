@@ -1,3 +1,4 @@
+use crate::game::components::asteroid::*;
 use crate::game::components::bullet::*;
 use crate::game::components::space_ship::*;
 use macroquad::prelude::*;
@@ -7,6 +8,7 @@ pub struct PlayingInfo {
     pub level: u32,
     pub space_ship: SpaceShip,
     pub bullets: Vec<Bullet>,
+    pub asteroids: Vec<Asteroid>,
 }
 
 pub enum GameState {

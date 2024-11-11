@@ -1,3 +1,4 @@
+use crate::game::components::asteroid::*;
 use crate::game::components::bullet::*;
 use crate::game::components::space_ship::*;
 use crate::game::core::game_states::*;
@@ -25,6 +26,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                             vec2(get_center_x(), get_center_y()),
                         ),
                         bullets: vec![],
+                        asteroids: create_asteroids(3),
                     },
                 };
             }
@@ -68,6 +70,11 @@ pub fn update_game_state(game_state: &mut GameState) {
                 .iter_mut()
                 .for_each(|b| b.body.update(dt));
             playing_info.bullets.retain(|b| !b.body.destroyed);
+
+            playing_info
+                .asteroids
+                .iter_mut()
+                .for_each(|a| a.body.update(dt));
 
             if is_key_released(KeyCode::Escape) {
                 *game_state = GameState::MainMenu;

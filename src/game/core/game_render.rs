@@ -26,6 +26,9 @@ pub fn render(game_state: &GameState) {
             playing_info.bullets.iter().for_each(|bullet| {
                 bullet.render();
             });
+            playing_info.asteroids.iter().for_each(|asteroid| {
+                asteroid.render();
+            });
         }
         GameState::GameOver => {
             draw_text("Game Over", 10.0, 10.0, 30.0, FONT_COLOR);
