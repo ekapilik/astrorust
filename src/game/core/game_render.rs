@@ -23,6 +23,9 @@ pub fn render(game_state: &GameState) {
         GameState::Playing { playing_info } => {
             render_playing_info(playing_info);
             playing_info.space_ship.render();
+            playing_info.bullets.iter().for_each(|bullet| {
+                bullet.render();
+            });
         }
         GameState::GameOver => {
             draw_text("Game Over", 10.0, 10.0, 30.0, FONT_COLOR);

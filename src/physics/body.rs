@@ -15,7 +15,7 @@ pub struct Body {
     pub rotation: f32,
     pub drag_coefficient: f32,
     pub screen_edge_behavior: ScreenEdgeBehavior,
-    pub destoryed: bool,
+    pub destroyed: bool,
 }
 
 impl Body {
@@ -92,7 +92,7 @@ impl Body {
             || self.point.y > screen_height
             || self.point.y < 0.0
         {
-            self.destoryed = true;
+            self.destroyed = true;
         }
     }
 }

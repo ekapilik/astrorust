@@ -35,7 +35,7 @@ impl SpaceShip {
                 acceleration: vec2(0.0, 0.0),
                 drag_coefficient: 0.99,
                 screen_edge_behavior: ScreenEdgeBehavior::Wrap,
-                destoryed: false,
+                destroyed: false,
             },
             ship_shape: Shape {
                 points: vec![

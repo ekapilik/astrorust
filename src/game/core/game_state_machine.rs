@@ -1,3 +1,4 @@
+use crate::game::components::bullet::*;
 use crate::game::components::space_ship::*;
 use crate::game::core::game_states::*;
 use crate::utils::screen_util::*;
@@ -5,6 +6,7 @@ use macroquad::prelude::*;
 
 const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
 const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
+const BULLET_VEL: f32 = 500.0;
 
 pub fn update_game_state(game_state: &mut GameState) {
     match game_state {
@@ -22,6 +24,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                             20.0,
                             vec2(get_center_x(), get_center_y()),
                         ),
+                        bullets: vec![],
                     },
                 };
             }
@@ -34,6 +37,7 @@ pub fn update_game_state(game_state: &mut GameState) {
             let rotate_left = is_key_down(KeyCode::Left) || is_key_down(KeyCode::A);
             let rotate_right = is_key_down(KeyCode::Right) || is_key_down(KeyCode::D);
             let thrust_forward = is_key_down(KeyCode::Up) || is_key_down(KeyCode::W);
+            let fire = is_key_released(KeyCode::Space);
 
             let mut rotation = 0.0;
             let mut thrust = 0.0;
@@ -47,10 +51,23 @@ pub fn update_game_state(game_state: &mut GameState) {
             if thrust_forward {
                 thrust += LINEAR_ACCELERATION;
             }
+            if fire {
+                playing_info.bullets.push(Bullet::new(
+                    playing_info.space_ship.body.point,
+                    playing_info.space_ship.body.rotation,
+                    BULLET_VEL,
+                ));
+            }
 
             playing_info.space_ship.body.rotate(rotation);
             playing_info.space_ship.apply_thrust(thrust);
             playing_info.space_ship.body.update(dt);
+
+            playing_info
+                .bullets
+                .iter_mut()
+                .for_each(|b| b.body.update(dt));
+            playing_info.bullets.retain(|b| !b.body.destroyed);
 
             if is_key_released(KeyCode::Escape) {
                 *game_state = GameState::MainMenu;
