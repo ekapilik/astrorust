@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 
 const FONT_COLOR: Color = WHITE;
 const BACKGROUND_COLOR: Color = BLACK;
-const DEV_MODE: bool = true;
+const DEV_MODE: bool = false;
 
 fn draw_fps() {
     if DEV_MODE {

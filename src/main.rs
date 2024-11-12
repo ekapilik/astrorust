@@ -8,7 +8,7 @@ use std::thread::sleep;
 use macroquad::prelude::*;
 
 const TARGET_FPS: f64 = 60.0;
-const DEV_MODE: bool = true;
+const DEV_MODE: bool = false;
 
 #[macroquad::main("Asteroids")]
 async fn main() {

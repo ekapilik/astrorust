@@ -76,6 +76,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                 .iter_mut()
                 .for_each(|a| a.body.update(dt));
 
+            let mut new_asteroids: Vec<Asteroid> = vec![];
             playing_info.asteroids.iter_mut().for_each(|a| {
                 playing_info.bullets.iter_mut().for_each(|b| {
                     if a.shape.collides_with(
@@ -88,6 +89,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                         a.body.destroyed = true;
                         b.body.destroyed = true;
                         playing_info.score += 1;
+                        new_asteroids.append(&mut split_asteroid(a));
                     }
                 });
                 if a.shape.collides_with(
@@ -101,6 +103,9 @@ pub fn update_game_state(game_state: &mut GameState) {
                 }
             });
 
+            if new_asteroids.len() > 0 {
+                playing_info.asteroids.append(&mut new_asteroids);
+            }
             playing_info.bullets.retain(|b| !b.body.destroyed); // remove destroyed bullets
             playing_info.asteroids.retain(|a| !a.body.destroyed); // remove destroyed asteroids
 

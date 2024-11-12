@@ -5,13 +5,38 @@ use crate::render::shape::*;
 use macroquad::prelude::*;
 use macroquad::rand::gen_range as random_range;
 
+#[derive(Clone)]
+pub enum AsteroidSizes {
+    Small,
+    Medium,
+    Large,
+}
+
+fn get_asteroid_scale(size: &AsteroidSizes) -> f32 {
+    match size {
+        AsteroidSizes::Small => 5.0,
+        AsteroidSizes::Medium => 10.0,
+        AsteroidSizes::Large => 20.0,
+    }
+}
+
+fn get_asteroid_velocity(size: &AsteroidSizes) -> f32 {
+    match size {
+        AsteroidSizes::Small => 100.0,
+        AsteroidSizes::Medium => 75.0,
+        AsteroidSizes::Large => 50.0,
+    }
+}
+
 pub struct Asteroid {
     pub body: Body,
     pub shape: Shape,
+    pub size: AsteroidSizes,
 }
 
 impl Asteroid {
-    pub fn new(start_point: Vec2, rotation: f32, velocity: f32, scale: f32) -> Asteroid {
+    pub fn new(start_point: Vec2, rotation: f32, size: &AsteroidSizes) -> Asteroid {
+        let scale = get_asteroid_scale(&size);
         let points = vec![
             vec2(-3.0, -2.0) * scale,
             vec2(-1.26, -2.76) * scale,
@@ -28,6 +53,7 @@ impl Asteroid {
             vec2(-3.0, -2.0) * scale,
         ];
 
+        let velocity = get_asteroid_velocity(&size);
         Asteroid {
             body: Body {
                 rotation,
@@ -43,6 +69,7 @@ impl Asteroid {
                 color: WHITE,
                 thickness: 2.0,
             },
+            size: size.clone(),
         }
     }
 
@@ -59,9 +86,24 @@ pub fn create_asteroids(level: u32) -> Vec<Asteroid> {
             random_range(0.0, screen_height()),
         );
         let rotation = random_range(0.0, 2.0 * std::f32::consts::PI);
-        let velocity = 50.0;
-        let scale = 20.0;
-        asteroids.push(Asteroid::new(start_point, rotation, velocity, scale));
+        asteroids.push(Asteroid::new(start_point, rotation, &AsteroidSizes::Large));
     }
     asteroids
+}
+
+pub fn split_asteroid(asteroid: &Asteroid) -> Vec<Asteroid> {
+    let mut new_asteroids: Vec<Asteroid> = vec![];
+    let start_point = asteroid.body.point;
+
+    let next_size = match asteroid.size {
+        AsteroidSizes::Large => AsteroidSizes::Medium,
+        AsteroidSizes::Medium => AsteroidSizes::Small,
+        AsteroidSizes::Small => return vec![],
+    };
+
+    for _ in 0..3 {
+        let rotation = random_range(0.0, 2.0 * std::f32::consts::PI);
+        new_asteroids.push(Asteroid::new(start_point, rotation, &next_size));
+    }
+    new_asteroids
 }
