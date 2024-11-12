@@ -10,13 +10,15 @@ const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
 const BULLET_VEL: f32 = 500.0;
 
 pub fn update_game_state(game_state: &mut GameState) {
+    let mut next_game_state: Option<GameState> = None;
+
     match game_state {
         GameState::MainMenu => {
             let start = is_key_released(KeyCode::Enter);
             let quit = is_key_released(KeyCode::Q);
 
             if start {
-                *game_state = GameState::Playing {
+                next_game_state = Some(GameState::Playing {
                     playing_info: PlayingInfo {
                         score: 0,
                         level: 1,
@@ -28,7 +30,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                         bullets: vec![],
                         asteroids: create_asteroids(1),
                     },
-                };
+                });
             }
             if quit {
                 std::process::exit(0);
@@ -42,6 +44,7 @@ pub fn update_game_state(game_state: &mut GameState) {
             let fire = is_key_released(KeyCode::Space);
             let escape = is_key_released(KeyCode::Escape);
 
+            let mut next_level: bool = false;
             let mut rotation = 0.0;
             let mut thrust = 0.0;
 
@@ -110,21 +113,50 @@ pub fn update_game_state(game_state: &mut GameState) {
             playing_info.asteroids.retain(|a| !a.body.destroyed); // remove destroyed asteroids
 
             if playing_info.asteroids.is_empty() {
-                playing_info.level += 1;
-                playing_info.asteroids = create_asteroids(playing_info.level);
+                next_level = true;
             }
 
             if playing_info.space_ship.body.destroyed {
-                *game_state = GameState::GameOver;
+                next_game_state = Some(GameState::GameOver {
+                    level: playing_info.level,
+                    score: playing_info.score,
+                });
             }
             if escape {
-                *game_state = GameState::MainMenu;
+                next_game_state = Some(GameState::MainMenu);
+            }
+            if next_level {
+                next_game_state = Some(GameState::NextLevel {
+                    level: playing_info.level,
+                    score: playing_info.score,
+                });
             }
         }
-        GameState::GameOver => {
+        GameState::NextLevel { level, score } => {
             if is_key_released(KeyCode::Enter) {
-                *game_state = GameState::MainMenu;
+                let next_level = *level + 1;
+                next_game_state = Some(GameState::Playing {
+                    playing_info: PlayingInfo {
+                        score: *score,
+                        level: next_level,
+                        space_ship: SpaceShip::new(
+                            20.0,
+                            20.0,
+                            vec2(get_center_x(), get_center_y()),
+                        ),
+                        bullets: vec![],
+                        asteroids: create_asteroids(next_level),
+                    },
+                });
             }
         }
+        GameState::GameOver { .. } => {
+            if is_key_released(KeyCode::Enter) {
+                next_game_state = Some(GameState::MainMenu);
+            }
+        }
+    }
+    if let Some(next_state) = next_game_state {
+        *game_state = next_state;
     }
 }

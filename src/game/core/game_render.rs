@@ -29,8 +29,11 @@ pub fn render(game_state: &GameState) {
                 asteroid.render();
             });
         }
-        GameState::GameOver => {
-            render_game_over();
+        GameState::NextLevel { level, score } => {
+            render_next_level(*level, *score);
+        }
+        GameState::GameOver { level, score } => {
+            render_game_over(*level, *score);
         }
     }
 }
@@ -70,7 +73,6 @@ fn render_playing_info(playing_info: &PlayingInfo) {
         30.0,
         FONT_COLOR,
     );
-
     draw_text(
         &format!("Level: {}", playing_info.level),
         screen_width() - 150.0,
@@ -80,7 +82,31 @@ fn render_playing_info(playing_info: &PlayingInfo) {
     );
 }
 
-fn render_game_over() {
+fn render_next_level(level: u32, score: u32) {
+    draw_text(
+        &format!("Level {} complete!", level),
+        get_center_x() - 60.0,
+        get_center_y(),
+        30.0,
+        FONT_COLOR,
+    );
+    draw_text(
+        &format!("Score: {}", score),
+        get_center_x() - 0.0,
+        get_center_y() + 30.0,
+        20.0,
+        FONT_COLOR,
+    );
+    draw_text(
+        &format!("Press Enter to continue to level {}...", level + 1),
+        get_center_x() - 100.0,
+        get_center_y() + 60.0,
+        20.0,
+        FONT_COLOR,
+    );
+}
+
+fn render_game_over(level: u32, score: u32) {
     draw_text(
         "Game Over",
         get_center_x(),
@@ -89,9 +115,16 @@ fn render_game_over() {
         FONT_COLOR,
     );
     draw_text(
-        "Press Enter to return to main menu",
+        &format!("Reached level {} with a score of {}", level, score),
         get_center_x() - 100.0,
         get_center_y() + 30.0,
+        20.0,
+        FONT_COLOR,
+    );
+    draw_text(
+        "Press Enter to return to main menu",
+        get_center_x() - 100.0,
+        get_center_y() + 60.0,
         20.0,
         FONT_COLOR,
     );

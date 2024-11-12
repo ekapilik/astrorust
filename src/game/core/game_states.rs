@@ -14,5 +14,6 @@ pub struct PlayingInfo {
 pub enum GameState {
     MainMenu,
     Playing { playing_info: PlayingInfo },
-    GameOver,
+    NextLevel { level: u32, score: u32 },
+    GameOver { level: u32, score: u32 },
 }
