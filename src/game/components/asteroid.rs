@@ -51,7 +51,7 @@ impl Asteroid {
     }
 }
 
-pub fn create_asteroids(level: u16) -> Vec<Asteroid> {
+pub fn create_asteroids(level: u32) -> Vec<Asteroid> {
     let mut asteroids: Vec<Asteroid> = vec![];
     for _ in 0..level {
         let start_point = vec2(

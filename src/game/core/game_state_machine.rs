@@ -26,7 +26,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                             vec2(get_center_x(), get_center_y()),
                         ),
                         bullets: vec![],
-                        asteroids: create_asteroids(3),
+                        asteroids: create_asteroids(1),
                     },
                 };
             }
@@ -103,6 +103,12 @@ pub fn update_game_state(game_state: &mut GameState) {
 
             playing_info.bullets.retain(|b| !b.body.destroyed); // remove destroyed bullets
             playing_info.asteroids.retain(|a| !a.body.destroyed); // remove destroyed asteroids
+
+            if playing_info.asteroids.is_empty() {
+                playing_info.level += 1;
+                playing_info.asteroids = create_asteroids(playing_info.level);
+            }
+
             if playing_info.space_ship.body.destroyed {
                 *game_state = GameState::GameOver;
             }
