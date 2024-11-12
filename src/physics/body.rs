@@ -3,7 +3,6 @@ use macroquad::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ScreenEdgeBehavior {
     Wrap,
-    Bounce,
     Destroy,
 }
 
@@ -40,7 +39,6 @@ impl Body {
 
         match self.screen_edge_behavior {
             ScreenEdgeBehavior::Wrap => self.warp_around(),
-            ScreenEdgeBehavior::Bounce => self.bounce(),
             ScreenEdgeBehavior::Destroy => self.destroy(),
         }
     }
@@ -57,25 +55,6 @@ impl Body {
             self.point.y = 0.0;
         } else if self.point.y < 0.0 {
             self.point.y = screen_height;
-        }
-    }
-
-    fn bounce(&mut self) {
-        let screen_width = screen_width();
-        let screen_height = screen_height();
-        if self.point.x > screen_width {
-            self.point.x = screen_width;
-            self.velocity.x *= -1.0;
-        } else if self.point.x < 0.0 {
-            self.point.x = 0.0;
-            self.velocity.x *= -1.0;
-        }
-        if self.point.y > screen_height {
-            self.point.y = screen_height;
-            self.velocity.y *= -1.0;
-        } else if self.point.y < 0.0 {
-            self.point.y = 0.0;
-            self.velocity.y *= -1.0;
         }
     }
 
