@@ -9,4 +9,14 @@ Rust setup: [get-started](https://www.rust-lang.org/learn/get-started)
 cargo run
 ```
 
+### Controls
+Thrust forward: `w` or `^`
+
+Rotate counter-clockwise: `a` or `<`
+
+Rotate clockwise: `d` or `>`
+
+Shoot: `<space>`
+
+## Demo
 <img src="./media/asteroids.gif" width="400" height="300"/>
