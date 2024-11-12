@@ -103,8 +103,11 @@ pub fn update_game_state(game_state: &mut GameState) {
 
             playing_info.bullets.retain(|b| !b.body.destroyed); // remove destroyed bullets
             playing_info.asteroids.retain(|a| !a.body.destroyed); // remove destroyed asteroids
-            if escape || playing_info.space_ship.body.destroyed {
+            if playing_info.space_ship.body.destroyed {
                 *game_state = GameState::GameOver;
+            }
+            if escape {
+                *game_state = GameState::MainMenu;
             }
         }
         GameState::GameOver => {

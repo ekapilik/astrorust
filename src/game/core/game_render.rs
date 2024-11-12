@@ -4,7 +4,6 @@ use macroquad::prelude::*;
 
 const FONT_COLOR: Color = WHITE;
 const BACKGROUND_COLOR: Color = BLACK;
-const TARGET_FPS: f32 = 60.0;
 const DEV_MODE: bool = true;
 
 fn draw_fps() {
@@ -34,9 +33,6 @@ pub fn render(game_state: &GameState) {
             render_game_over();
         }
     }
-
-    let frame_sleep_duration = std::time::Duration::from_secs_f32(1.0 / TARGET_FPS);
-    std::thread::sleep(frame_sleep_duration);
 }
 
 fn render_main_menu() {
