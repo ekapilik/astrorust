@@ -40,6 +40,7 @@ pub fn update_game_state(game_state: &mut GameState) {
             let rotate_right = is_key_down(KeyCode::Right) || is_key_down(KeyCode::D);
             let thrust_forward = is_key_down(KeyCode::Up) || is_key_down(KeyCode::W);
             let fire = is_key_released(KeyCode::Space);
+            let escape = is_key_released(KeyCode::Escape);
 
             let mut rotation = 0.0;
             let mut thrust = 0.0;
@@ -69,14 +70,32 @@ pub fn update_game_state(game_state: &mut GameState) {
                 .bullets
                 .iter_mut()
                 .for_each(|b| b.body.update(dt));
-            playing_info.bullets.retain(|b| !b.body.destroyed);
 
             playing_info
                 .asteroids
                 .iter_mut()
                 .for_each(|a| a.body.update(dt));
 
-            if is_key_released(KeyCode::Escape) {
+            playing_info.asteroids.iter_mut().for_each(|a| {
+                playing_info.bullets.iter_mut().for_each(|b| {
+                    if a.shape.collides_with(
+                        a.body.point,
+                        a.body.rotation,
+                        &b.shape,
+                        b.body.point,
+                        b.body.rotation,
+                    ) {
+                        a.body.destroyed = true;
+                        b.body.destroyed = true;
+                        playing_info.score += 1;
+                    }
+                });
+            });
+
+            playing_info.bullets.retain(|b| !b.body.destroyed);
+            playing_info.asteroids.retain(|a| !a.body.destroyed);
+
+            if escape {
                 *game_state = GameState::MainMenu;
             }
         }

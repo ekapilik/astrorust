@@ -34,11 +34,6 @@ impl Body {
     }
 
     pub fn update(&mut self, dt: f32) {
-        debug!("--------------");
-        debug!("point: {:?}", self.point);
-        debug!("velocity: {:?}", self.velocity);
-        debug!("acceleration: {:?}", self.acceleration);
-        debug!("rotation: {:?}", self.rotation);
         self.velocity += self.acceleration * dt;
         self.point += self.velocity * dt;
         self.drag();

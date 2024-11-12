@@ -1,3 +1,4 @@
+use crate::physics::collision::is_colliding;
 use macroquad::prelude::*;
 
 pub struct Shape {
@@ -41,5 +42,18 @@ impl Shape {
             );
             prev_point = point;
         }
+    }
+
+    pub fn collides_with(
+        &self,
+        center: Vec2,
+        rotation: f32,
+        other: &Shape,
+        other_center: Vec2,
+        other_rotation: f32,
+    ) -> bool {
+        let transformed_points = self.transform(center, rotation);
+        let other_transformed_points = other.transform(other_center, other_rotation);
+        return is_colliding(&transformed_points, &other_transformed_points);
     }
 }
