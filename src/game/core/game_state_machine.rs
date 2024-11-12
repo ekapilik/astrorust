@@ -90,13 +90,21 @@ pub fn update_game_state(game_state: &mut GameState) {
                         playing_info.score += 1;
                     }
                 });
+                if a.shape.collides_with(
+                    a.body.point,
+                    a.body.rotation,
+                    &playing_info.space_ship.ship_shape,
+                    playing_info.space_ship.body.point,
+                    playing_info.space_ship.body.rotation,
+                ) {
+                    playing_info.space_ship.body.destroyed = true;
+                }
             });
 
-            playing_info.bullets.retain(|b| !b.body.destroyed);
-            playing_info.asteroids.retain(|a| !a.body.destroyed);
-
-            if escape {
-                *game_state = GameState::MainMenu;
+            playing_info.bullets.retain(|b| !b.body.destroyed); // remove destroyed bullets
+            playing_info.asteroids.retain(|a| !a.body.destroyed); // remove destroyed asteroids
+            if escape || playing_info.space_ship.body.destroyed {
+                *game_state = GameState::GameOver;
             }
         }
         GameState::GameOver => {

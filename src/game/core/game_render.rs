@@ -31,7 +31,7 @@ pub fn render(game_state: &GameState) {
             });
         }
         GameState::GameOver => {
-            draw_text("Game Over", 10.0, 10.0, 30.0, FONT_COLOR);
+            render_game_over();
         }
     }
 
@@ -80,6 +80,23 @@ fn render_playing_info(playing_info: &PlayingInfo) {
         screen_width() - 150.0,
         20.0,
         30.0,
+        FONT_COLOR,
+    );
+}
+
+fn render_game_over() {
+    draw_text(
+        "Game Over",
+        get_center_x(),
+        get_center_y(),
+        30.0,
+        FONT_COLOR,
+    );
+    draw_text(
+        "Press Enter to return to main menu",
+        get_center_x() - 100.0,
+        get_center_y() + 30.0,
+        20.0,
         FONT_COLOR,
     );
 }
