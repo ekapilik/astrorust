@@ -91,7 +91,7 @@ pub fn update_game_state(game_state: &mut GameState) {
                     ) {
                         a.body.destroyed = true;
                         b.body.destroyed = true;
-                        playing_info.score += 1;
+                        playing_info.score += get_asteroid_score(&a.size);
                         new_asteroids.append(&mut split_asteroid(a));
                     }
                 });

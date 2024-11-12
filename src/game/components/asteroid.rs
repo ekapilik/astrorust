@@ -28,6 +28,14 @@ fn get_asteroid_velocity(size: &AsteroidSizes) -> f32 {
     }
 }
 
+pub fn get_asteroid_score(size: &AsteroidSizes) -> u32 {
+    match size {
+        AsteroidSizes::Small => 1,
+        AsteroidSizes::Medium => 2,
+        AsteroidSizes::Large => 3,
+    }
+}
+
 pub struct Asteroid {
     pub body: Body,
     pub shape: Shape,
