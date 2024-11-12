@@ -11,7 +11,7 @@ pub fn is_colliding(polygon_a: &Vec<Vec2>, polygon_b: &Vec<Vec2>) -> bool {
     return false;
 }
 
-fn point_in_polygon(point: &Vec2, polygon: &Vec<Vec2>) -> bool {
+pub fn point_in_polygon(point: &Vec2, polygon: &Vec<Vec2>) -> bool {
     // https://en.wikipedia.org/wiki/Point_in_polygon
     let x = point.x;
     let y = point.y;

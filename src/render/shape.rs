@@ -17,7 +17,7 @@ fn rotate_point(base: Vec2, end: Vec2, rotation: f32) -> Vec2 {
 }
 
 impl Shape {
-    fn transform(&self, center: Vec2, rotation: f32) -> Vec<Vec2> {
+    pub fn transform(&self, center: Vec2, rotation: f32) -> Vec<Vec2> {
         let translated_points: Vec<Vec2> =
             self.points.iter().map(|point| *point + center).collect();
         let rotated_points: Vec<Vec2> = translated_points

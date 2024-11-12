@@ -2,12 +2,14 @@ use crate::game::components::asteroid::*;
 use crate::game::components::bullet::*;
 use crate::game::components::space_ship::*;
 use crate::game::core::game_states::*;
+use crate::physics::collision::point_in_polygon;
 use crate::utils::screen_util::*;
 use macroquad::prelude::*;
 
 const LINEAR_ACCELERATION: f32 = 300.0; // pixels per second squared
 const ROTATIONAL_ACCELERATION: f32 = 0.10; // radians per second squared
 const BULLET_VEL: f32 = 500.0;
+const DEV_MODE: bool = false;
 
 pub fn update_game_state(game_state: &mut GameState) {
     let mut next_game_state: Option<GameState> = None;
@@ -116,6 +118,10 @@ pub fn update_game_state(game_state: &mut GameState) {
                 next_level = true;
             }
 
+            if DEV_MODE {
+                render_grid_points(&playing_info.asteroids);
+            }
+
             if playing_info.space_ship.body.destroyed {
                 next_game_state = Some(GameState::GameOver {
                     level: playing_info.level,
@@ -158,5 +164,34 @@ pub fn update_game_state(game_state: &mut GameState) {
     }
     if let Some(next_state) = next_game_state {
         *game_state = next_state;
+    }
+}
+
+fn render_grid_points(asteroids: &Vec<Asteroid>) {
+    let step = 5;
+    let x_points = (0..(screen_width() as i32)).step_by(step);
+    let y_points = (0..(screen_height() as i32)).step_by(step);
+
+    for x in x_points {
+        for y in y_points.clone() {
+            let point = vec2(x as f32, y as f32);
+            let mut point_in_asteroid = false;
+
+            for asteroid in asteroids.iter() {
+                let transformed_points = asteroid
+                    .shape
+                    .transform(asteroid.body.point, asteroid.body.rotation);
+                if point_in_polygon(&point, &transformed_points) {
+                    point_in_asteroid = true;
+                    break;
+                }
+            }
+
+            if point_in_asteroid {
+                draw_circle(point.x, point.y, 2.0, RED);
+            } else {
+                // draw_circle(point.x, point.y, 1.0, WHITE);
+            }
+        }
     }
 }
